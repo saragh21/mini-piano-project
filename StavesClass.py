@@ -21,7 +21,7 @@ class Staves(QGraphicsScene):
         pen = QPen(Qt.GlobalColor.black, 2)
         stave_count = 2  # Number of staves
         lines_per_stave = 5  # Number of lines per stave
-        stave_spacing = 15  # Space between each line
+        stave_spacing = 10  # Space between each line
         stave_length = 700  # Length of each stave line
         top_margin = 50  # Top margin for the first stave
 
@@ -36,35 +36,34 @@ class Staves(QGraphicsScene):
     def add_quarter_note(self, key):
         # Define the vertical positions for each note on the stave
         note_positions = {
-    'c4': self.stave_lines[0][4].line().y1() + 10,  # Below the first line
-    'd4': self.stave_lines[0][4].line().y1(),  # On the first line
-    'e4': self.stave_lines[0][3].line().y1(),  # On the second line
-    'f4': self.stave_lines[0][3].line().y1() - 5,  # Between the second and third lines
-    'g4': self.stave_lines[0][2].line().y1(),
-            'a4': self.stave_lines[0][2].line().y1() - 5,
-            'b4': self.stave_lines[0][1].line().y1(),
-            'c5': self.stave_lines[0][1].line().y1() - 5,
-            'd5': self.stave_lines[0][0].line().y1(),
-            'e5': self.stave_lines[0][0].line().y1() - 5,
-            'f5': self.stave_lines[1][4].line().y1(),
-            'g5': self.stave_lines[1][4].line().y1() - 5,
-            'a5': self.stave_lines[1][3].line().y1(),
-            'b5': self.stave_lines[1][3].line().y1() - 5,
-            'c6': self.stave_lines[1][2].line().y1(),
+    'c4': self.stave_lines[1][3].line().y1() -10, 
+    'd4': self.stave_lines[1][2].line().y1()-5, 
+    'e4': self.stave_lines[1][2].line().y1()- 10, # On the first line
+    'f4': self.stave_lines[1][1].line().y1() -5 ,  # Between the first and second lines
+    'g4': self.stave_lines[1][1].line().y1()-10,
+            'a4': self.stave_lines[1][0].line().y1() -5,
+            'b4': self.stave_lines[1][0].line().y1()-10,
+            'c5': self.stave_lines[0][4].line().y1() +10,
+            'd5': self.stave_lines[0][4].line().y1() ,
+            'e5': self.stave_lines[0][4].line().y1() - 5,
+            'f5': self.stave_lines[0][3].line().y1(),
+            'g5': self.stave_lines[0][3].line().y1() - 5,
+            'a5': self.stave_lines[0][2].line().y1(),
+            'b5': self.stave_lines[0][2].line().y1() - 5,
+            'c6': self.stave_lines[0][1].line().y1(),
             # Define positions for black keys (sharps/flats)
-            'c40': self.stave_lines[0][4].line().y1() + 5,
-            'd40': self.stave_lines[0][4].line().y1() - 2.5,
-            'f40': self.stave_lines[0][3].line().y1() - 2.5,
-            'g40': self.stave_lines[0][2].line().y1() + 5,
-            'a40': self.stave_lines[0][2].line().y1() - 2.5,
-            'c50': self.stave_lines[0][1].line().y1() + 5,
-            'd50': self.stave_lines[0][1].line().y1() - 2.5,
-            'f50': self.stave_lines[0][0].line().y1() + 5,
-            'g50': self.stave_lines[0][0].line().y1() - 2.5,
-            'a50': self.stave_lines[1][4].line().y1() - 2.5,
+            'c40': self.stave_lines[1][3].line().y1() - 10,
+            'd40': self.stave_lines[1][2].line().y1() -5,
+            'f40': self.stave_lines[1][1].line().y1() - 5,
+            'g40': self.stave_lines[1][1].line().y1() -10,
+            'a40': self.stave_lines[1][0].line().y1() -5,
+            'c50': self.stave_lines[0][4].line().y1() + 10,
+            'd50': self.stave_lines[0][4].line().y1() ,
+            'f50': self.stave_lines[0][3].line().y1() + 5,
+            'g50': self.stave_lines[0][3].line().y1() - 5,
+            'a50': self.stave_lines[0][2].line().y1() ,
         }
-         
-
+        
 
         # Use the current x-position for the new note
         x_position = self.current_x_position
@@ -81,7 +80,7 @@ class Staves(QGraphicsScene):
             note_head.setBrush(QBrush(Qt.GlobalColor.black))
 
             # Create the note stem (line)
-            stem_height = 35  
+            stem_height = 25
             note_stem = QGraphicsLineItem(x_position + 5, y_position, x_position + 5, y_position - stem_height)
             note_stem.setPen(QPen(Qt.GlobalColor.black, 2))
 
