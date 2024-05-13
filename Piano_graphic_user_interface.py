@@ -1,94 +1,111 @@
-from PyQt6.QtWidgets import QWidget,QMainWindow,QMenuBar,QHBoxLayout,QGraphicsScene,QGraphicsView,QGridLayout,QLabel
+ from PyQt6.QtWidgets import QFileDialog,QMenu, QComboBox, QWidget, QMainWindow, QMenuBar, QHBoxLayout, QGraphicsView, QGridLayout, QLabel
 from PianoWidget1 import PianoWidget1
 from StavesClass import Staves
+from Metronome import Metronome
+from PyQt6.QtGui import QAction
+from PyQt6.QtCore import Qt
+ 
 
 class piano_GUI(QMainWindow):
     def __init__(self, size):
         super().__init__()
-        self.size=size
-        self.setCentralWidget(QWidget()) # QMainWindown must have a centralWidget to be able to add layouts
-        self.grid = QGridLayout() # Grid main layout
+        self.size = size
+        self.setCentralWidget(QWidget())  # QMainWindow must have a centralWidget to be able to add layouts
+        self.grid = QGridLayout()  # Grid main layout
         self.centralWidget().setLayout(self.grid)
         self.init_window()
-        self.init_staves()
-
-    def save(self):
-        pass
-
-    def load(self):
-        pass
 
     def init_window(self):
         """
         Sets up the window.
     
         """
-
-        # Instantiate PianoWidget1
-        self.pianoWidget = PianoWidget1()
-        pianoWindow = QMainWindow()  # Create a new QMainWindow for PianoWidget1
-        self.pianoWidget.retranslateUi(self.pianoWidget) # Set the keyboard shortcuts
-        self.pianoWidget.setupUi(pianoWindow)  # Setup the UI of PianoWidget1 inside this QMainWindow
-        self.setGeometry(700, 700, 700, 700)
-        self.setWindowTitle('minipiano')
-        # self.show()
+        # Create a menu bar
+        menu_bar = self.menuBar()
+        # Instantiate the Metronome, PianoWidget1, and Staves
+        self.metronome = Metronome()
+        self.staves = Staves()
+        self.pianoWidget = PianoWidget1(self.staves)
+        pianoWindow = QMainWindow()
+        self.pianoWidget.notePlayed.connect(self.staves.add_quarter_note)
          
-        # stavesWindow = QMainWindow()  # Create a new QMainWindow for PianoWidget1
-        # self.Stavesclass.setupUi(stavesWindow)  # Setup the UI of PianoWidget1 inside this QMainWindow
-        # self.setGeometry(700, 700, 700, 700)
-        # self.setWindowTitle('staves')
-        # # Add a scene for drawing 2d objects
-        # self.scene = QGraphicsScene()
-        # self.scene.setSceneRect(0, 0, 700, 700)
+        self.pianoWidget.setupUi(pianoWindow)  # Setup the UI of PianoWidget1 inside this QMainWindow
+        self.setGeometry(100, 100, 800, 600) 
+        self.setWindowTitle('minipiano')
 
-        # # Add a view for showing the scene
-        # self.view =QGraphicsView(self.scene, self)
-        # self.view.adjustSize()
-        # self.view.show()
+        time_signature_menu = QMenu("Time Signature", self)
+        menu_bar.addMenu(time_signature_menu)
+
+        save_action = QAction("Save Notes", self)
+        save_action.triggered.connect(self.save_notes)
+        menu_bar = self.menuBar()
+        file_menu = menu_bar.addMenu("File")
+        file_menu.addAction(save_action)
+
+        # Create actions for 4/4 and 3/4 time signatures
+        time_signature_4_4_action = QAction("4/4", self)
+        time_signature_3_4_action = QAction("3/4", self)
+
+        # Add actions to the time signature menu
+        time_signature_menu.addAction(time_signature_4_4_action)
+        time_signature_menu.addAction(time_signature_3_4_action)
+
+         # Connect actions to the method that changes the time signature
+        time_signature_4_4_action.triggered.connect(lambda: self.change_time_signature('4/4'))
+        time_signature_3_4_action.triggered.connect(lambda: self.change_time_signature('3/4'))
         
-        # Create the four layouts
+         # Create the four layouts
         self.topLeftLayout = QHBoxLayout()
         self.topRightLayout = QHBoxLayout()
         self.bottomLeftLayout = QHBoxLayout()
         self.bottomRightLayout = QHBoxLayout()
 
+
+        # Set the fixed sizes for the widgets  
+        metronome_size = (200, 300)  
+        piano_and_staves_size = (600, 300)   
+
+        self.metronome.setFixedSize(*metronome_size)
+        self.pianoWidget.setFixedSize(*piano_and_staves_size)
+        self.stavesView = QGraphicsView(self.staves, self)
+        self.stavesView.setFixedSize(*piano_and_staves_size)
+        
+        #self.stavesView.fitInView(self.staves.sceneRect(), Qt.AspectRatioMode.KeepAspectRatio)  # Fit the view to the scene
+        # Add the widgets to the corresponding layouts
+        self.topLeftLayout.addWidget(self.metronome)
+        self.topRightLayout.addWidget(self.stavesView)
+        self.bottomRightLayout.addWidget(self.pianoWidget)
+        self.stavesView.setAlignment(Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignLeft)
         # Add the layouts to the grid
         self.grid.addLayout(self.topLeftLayout, 0, 0)
         self.grid.addLayout(self.topRightLayout, 0, 1)
         self.grid.addLayout(self.bottomLeftLayout, 1, 0)
         self.grid.addLayout(self.bottomRightLayout, 1, 1)
+         
+        self.bottomRightLayout.addWidget(self.pianoWidget)  # Add the piano widget directly
 
-        # Add the view to the bottom right layout
-        # self.bottomRightLayout.addWidget(self.view)
-
-         # Add widgets to the other layouts and set their sizes
-        self.topLeftWidget = QLabel("metronome", self)
-        self.topLeftWidget.setFixedSize(100, 350)
-        self.topLeftLayout.addWidget(self.topLeftWidget)
-
-        self.topRightWidget = QLabel("staves", self)
-        self.topRightWidget.setFixedSize(600, 350)
-        self.topRightLayout.addWidget(self.topRightWidget)
-
-        self.bottomLeftWidget = QLabel("soundEffects", self)
-        self.bottomLeftWidget.setFixedSize(100, 350)
-        self.bottomLeftLayout.addWidget(self.bottomLeftWidget)
- 
-        self.bottomRightWidget = QLabel("piano", self)
-        self.bottomRightWidget.setFixedSize(700, 350)
-        self.bottomRightLayout.addWidget(self.bottomRightWidget)
-
-
-        # Add the piano widget and staves to the right layouts
+        # Add the piano widget to the right layout
         self.grid.addWidget(pianoWindow, 1, 1)  # Add it to the grid layout at position (1, 1)
-         
-         
+        # Connect the notePlayed signal to the updateView slot
+        #self.pianoWidget.notePlayed.connect(self.updateView)
+        self.show()
+
+    def change_time_signature(self, signature):
+        self.staves.set_time_signature(signature)
         
-        # Show the window
-        self.show()
- 
-    def init_staves(self):
-        # Instantiate Staves
-        self.staves = Staves()
-        self.grid.addWidget(self.staves, 0, 1)  # Add it to the top right layout
-        self.show()
+    def save_notes(self):
+        fileName, _ = QFileDialog.getSaveFileName(self, "Save Notes", "",
+                                                "Text Files (*.txt);;All Files (*)")
+        if fileName:
+            with open(fileName, 'w') as file:
+                for note in self.notes:
+                    file.write(f"{note}\n")
+                file.flush()
+            print(f"Notes saved to {fileName}")
+    def updateView(self, key):
+        print(f"Note played: {key}, updating view.")
+
+        # Print the scene rect and viewport rect
+        scene_rect = self.staves.sceneRect()
+        
+
